@@ -1,0 +1,244 @@
+Part 2 Slide Game
+
+import pygame, simpleGE, random
+
+class Charlie(simpleGE.Sprite): - making a class with a sprite for Charlie, aka the Mug
+	def __init__(self, scene): - initialize both self to modify charlie and the Scene
+		super().__init__(scene) so that we can reuse intialized scenes
+		set the Charlie image
+		set Charlie's size to 25,25
+		set charlies starting position to 320, 400
+		ser Charlie's speed to 5
+	def process(self):
+		If user presses the left arrow:
+			subtract the speed value from the x position
+		if user presses the right arrow:
+			add the speed value to the x position
+		if user presses the up arrow:
+			subtract the speed value from the y position
+		if user presses the down arrow:
+			add the speed value to the y position
+		
+class Coin(simpleGE.Sprite): - creating class Coin with a sprite, aka the Orange. 
+	def __init__ with parameters self and scene
+		super().__init__(scene) so that we can reuse intialized scenes
+		set the coin image to the image Orange.png
+		set the coin size to 25,25
+		set the coins minimum speed to 3
+		set the coins maximum speed to 8
+		set the coints minimum negative value to -3 (minimum as in smallest movement distance, in the negative direction)
+		set the coins maximum negative value to negative 8
+		self.reset() call function reset
+	def reset(self):
+		choose side of the screen coins/hurts come from by selecting a  random int # 1 through 4
+		if # == 1:
+			self.y = 10
+            		self.x = random.randint(0, self.screenWidth)
+            		self.dy = random.randint(self.minSpeed,self.maxSpeed) (top of screen to bottom)
+		 if # == 2:  
+			self.y = random.randint(0, self.screenHeight)
+            		self.x = 640
+            		self.dx = random.randint(self.maxNegative, self.minNegative) (right of screen to left)
+		if # == 3:
+			self.y = 450
+           		self.x = random.randint(0, self.screenWidth)
+           		self.dy = random.randint(self.maxNegative, self.minNegative) (bottom of screen to top)
+		if # == 4:
+			self.y = random.randint(0, self.screenHeight)
+            		self.x = 0
+            		self.dx = random.randint(self.minSpeed,self.maxSpeed) (left of screen to right)
+	def checkBounds(self): 
+		if the bottom of the the coin is greater than the screen height:
+			reset the coin, giving it new random numbers as well
+		elif the y value is less than 0:
+			reset the coin
+		elif the x value is greaeter than 640:
+			reset the coin
+		elif the x value is less than 0:
+			reset the coin (all 4 collectively reset the coin if it exists the screen that is visible to the play)
+
+		
+class Hurt(simpleGE.Sprite): - creating class Hurt with a sprite, aka the Spider
+	def __init__ with parameters self and scene
+		super().__init__(scene) so that we can reuse intialized scenes
+		set the Spider image (using self) (its the obstacle charlie should avoid)
+		set the hurts size to 25,25
+		set the hurts minimum speed to 5
+		set the hurts maximum speed to 8
+		set the coints minimum negative value to -3 (minimum as in smallest movement distance, in the negative direction)
+		set the coins maximum negative value to negative 8
+
+		self.reset() call function reset
+	def reset(self):
+		choose side of the screen coins/hurts come from by selecting a  random int # 1 through 4
+		if # == 1:
+			self.y = 10
+            		self.x = random.randint(0, self.screenWidth)
+            		self.dy = random.randint(self.minSpeed,self.maxSpeed) (top of screen to bottom)
+		 if # == 2:  
+			self.y = random.randint(0, self.screenHeight)
+            		self.x = 640
+            		self.dx = random.randint(self.maxNegative, self.minNegative) (right of screen to left)
+		if # == 3:
+			self.y = 450
+           		self.x = random.randint(0, self.screenWidth)
+           		self.dy = random.randint(self.maxNegative, self.minNegative) (bottom of screen to top)
+		if # == 4:
+			self.y = random.randint(0, self.screenHeight)
+            		self.x = 0
+            		self.dx = random.randint(self.minSpeed,self.maxSpeed) (left of screen to right)
+
+	def checkBounds(self):
+		if the bottom of the the hurt is greater than the screen height:
+			reset the hurt, giving it new random numbers as well
+		elif the y value is less than 0:
+			reset the hurt
+		elif the x value is greaeter than 640:
+			reset the hurt
+		elif the x value is less than 0:
+			reset the hurt (all 4 collectively reset the hurt if it exists the screen that is visible to the play)
+
+class LblScore(simpleGE.Label):
+	def _init__(self):
+		super initialize
+		set text = Score:0 (which will be replaced by new scores)
+		center the text at 100, 30
+class LblTime(simpleGE.Label):
+		def _init__(self):
+		super initialize
+		set tex = Time left: 10 (which will be replaced by the actual timer)
+
+class Game(simpleGE.Scene):
+	def __init__ with parameter self
+		super().__init__(scene) so that we can reuse intialized scenes
+		set the background image to diningRoom
+		set a self variable for the coin pickup sound
+		set a self variable for the hurt contact sound
+		set the number of coins equal to 10
+		set the number of hurts equal to 4
+		self.charlie = Charlie(self), ensuring that all times we call the variables work together to make charlie
+		self.coins[] to make a list to add coins to
+		self.hurts[] to make a list to add hurts to
+		for i in range(number of coins):
+			append the coins to the list
+		for i in range(number of hurts):
+			append the list to add the hurts
+		self.sprites= [self.charlie, self.coins,self.hurts,self.lblscore,self.lblTime], in order to set the sprites
+	def setPrevScore(self, prevScore):
+		set self.prevScore = prevScore to easily modify it
+		self.lblScore.text = f":Last score: {self.prevScore}"
+	def process(self):
+		for coin in self.coins:
+			if the coin collides with charlie:
+				reset the coin
+				play the coin collection sound
+				add 1 to the score
+				update the label to refelct the new score
+		for hurt in self.hurts:
+			if a hurt collides with charlie:
+				reset the hurt
+				play the hurt sound
+				subtract 1 from the score
+				update label to reflect the new score
+		self.lblTime.text = countdown timer
+		if timer is less than 0:
+			print the score
+			stop the game
+class Instructions(simpleGE.Scene):
+    def __init__(self, prevScore):
+        super().__init__()
+	self.prevScore = prevScore for easy modification	
+	set the backgorund image to diningRoom
+	set self.response = "Quit"
+	make the multilabel for modification directions
+	set the directions text in textlines = 
+	"You live in BSU housing, which you didn't clean",
+            "Now, spiders are crawling around in the morning",
+            "Catch oranges in your mug, but not spiders!",
+            "",
+            "If there are spiders in my morning OJ",
+            "My day is ruined and I will cry"
+	center directions at 320,240
+	size directions dimensions 500 by 250
+	make the play button
+	make the text"Play"
+	make the text purple
+	make background clear
+	set the play button at 100,400
+	make the quit button
+	set the quit button text as "Quit"
+	set the text color = red
+	center the quit label at 540, 400
+	create the score label
+	center the score label at 320, 400
+	set the text of the label = prevScore, the last score recorded in the game
+	make the backgorund clear
+	self.sprites = [self.directions,
+                        self.btnPlay,
+                        self.btnQuit,
+                        self.lblScore]
+	def process(self):
+		if play button clicked:
+			response is "Play", playing the game
+			stop the current menu
+		if quit button is clickedL
+			response is "Quit", quittng the game
+			stop the current menu
+		
+	
+	
+def main():
+	keepGoing = True
+	lasrScore = 0
+	 while keepGoing:
+        	instructions = Instructions(lastScore)
+        	instructions.start()
+        	if instructions.response == "Play":
+            		game = Game()
+            		game.start()
+            		lastScore = game.score, preservning the eprevious score
+        	else:
+            		keepGoing = False
+if __name__ == "__main__":
+    main()
+
+Choose a roandom value value to select up down left right, 
+find side, then where on what side 
+
+harris has getangle in simpleGE 
+
+Variable List:
+setImage
+setSize
+position
+moveSpeed
+isKeyPressed
+minSpeed
+maxSpeed
+x
+y
+dy
+screenWidth
+bottom
+screenHeight
+sndCoin
+sndHurt
+numCoins
+numHurt
+charlie
+coins
+hurts
+game
+response
+instructions
+lastScore
+game
+btnPlay
+btnQuit
+lblScore
+directions
+prevScore
+maxNegative
+minNegative
+
+Other Resources Used, such as sprites, included in design doc
